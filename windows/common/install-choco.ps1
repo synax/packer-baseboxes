@@ -10,4 +10,5 @@ for ([byte]$c = [char]'A'; $c -le [char]'Z'; $c++)
 	}
 }
 
-choco install 7zip -y
+# Install Chocolatey
+Set-ExecutionPolicy Bypass -Scope Process -Force; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))

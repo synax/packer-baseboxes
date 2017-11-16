@@ -7,7 +7,7 @@
     "iso_url": "http://releases.ubuntu.com/16.04/ubuntu-16.04.3-server-amd64.iso",
     "iso_checksum_type": "sha1",
     "iso_checksum": "F3532991E031CAE75BCF5E695AFB844DD278FFF9",
-    "hyperv_switchname": "{{env `hyperv_switchname`}}",
+    "hyperv_switchname": "internet",
     "username" : "vagrant",
     "password" : "vagrant"
   },
