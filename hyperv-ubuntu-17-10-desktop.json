@@ -1,0 +1,96 @@
+{
+    "variables": {
+     "vm_name": "ubuntu-17-10-desktop",
+      "box_name": "ubuntu-17-10-desktop",
+      "vagrant_cloud_token":"{{ env `vagrant_cloud_token`}}",
+      "version":"1.0.{{timestamp}}",
+      "cpu": "2",
+      "ram_size": "4096",
+      "disk_size": "21440",
+      "iso_url": "http://releases.ubuntu.com/17.10/ubuntu-17.10-desktop-amd64.iso",
+      "iso_checksum_type": "sha1",
+      "iso_checksum": "0a07525516e891d2e09759cde1aa4118aaa55a30",
+      "hyperv_switchname": "internet",
+      "username" : "vagrant",
+      "password" : "vagrant"
+    },
+    "builders": [
+    {
+      "vm_name":"{{user `vm_name`}}",
+      "type": "hyperv-iso",
+      "disk_size": "{{user `disk_size`}}",
+      "guest_additions_mode":"disable",
+      "iso_url": "{{user `iso_url`}}",
+      "iso_checksum_type": "{{user `iso_checksum_type`}}",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "communicator":"ssh",
+      "ssh_username": "{{user `username`}}",
+      "ssh_password": "{{user `password`}}",	
+      "ssh_timeout" : "4h",
+      "http_directory": "./linux/ubuntu/http/",
+      "boot_wait": "5s",
+      "boot_command": [
+        "<esc><wait10><esc><esc><enter><wait>",
+        "set gfxpayload=1024x768<enter>",
+        "linux /casper/vmlinuz.efi ",
+        "quiet ",
+        "preseed/url=http://{{.HTTPIP}}:{{.HTTPPort}}/preseed-desktop.cfg ",
+        "debian-installer=en_US auto locale=en_US kbd-chooser/method=us ",
+        "hostname={{.Name}} ",
+        "fb=false debconf/frontend=noninteractive ",
+        "keyboard-configuration/modelcode=SKIP keyboard-configuration/layout=USA ",
+        "keyboard-configuration/variant=USA console-setup/ask_detect=false <enter>",
+        "initrd /casper/initrd.lz<enter>",
+        "boot<enter>"
+      ],
+      "shutdown_command": "echo 'vagrant' | sudo -S -E shutdown -P now",
+      "ram_size": "{{user `ram_size`}}",
+      "cpu": "{{user `cpu`}}",
+      "generation": 2,
+      "switch_name":"{{user `hyperv_switchname`}}",
+      "enable_virtualization_extensions": true,
+      "enable_secure_boot":false,
+      "enable_dynamic_memory":false,
+      "enable_mac_spoofing":true
+    }],
+    "provisioners": [
+        {
+            "type": "shell",
+            "execute_command": "echo 'vagrant' | sudo -S -E sh {{.Path}}",
+            "scripts": [
+                "./linux/ubuntu/update.sh",
+                "./linux/ubuntu/desktop.sh",
+                "./linux/ubuntu/hyperv-xenial.sh",
+                "./linux/ubuntu/hyperv-gen2.sh",
+                "./linux/common/reboot.sh"
+            ],
+            "expect_disconnect": true
+        },
+        {
+            "type": "shell",
+            "pause_before": "10s",
+            "execute_command": "echo 'vagrant' | sudo -S -E sh {{.Path}}",
+            "scripts": [
+                "./linux/ubuntu/network.sh",
+                "./linux/common/vagrant.sh",
+                "./linux/common/motd.sh",
+                "./linux/ubuntu/cleanup.sh"
+            ]
+        }
+    ],
+     "post-processors": [
+      [
+        {
+          "type": "vagrant",
+          "keep_input_artifact": false,
+          "output": "{{.Provider}}_{{user `box_name`}}.box"
+        },        
+        {
+          "type": "vagrant-cloud",
+          "box_tag": "synax/{{user `box_name`}}",
+          "access_token": "{{user `vagrant_cloud_token`}}",
+          "version": "{{user `version`}}"      
+        }
+      ]
+    ]
+}

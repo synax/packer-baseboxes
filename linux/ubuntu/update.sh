@@ -8,3 +8,4 @@ apt-get -y upgrade
 apt-get -y install dkms
 apt-get -y install nfs-common
 apt-get -y install byobu
+apt-get -y install curl

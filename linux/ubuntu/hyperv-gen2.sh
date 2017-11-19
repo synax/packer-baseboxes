@@ -12,6 +12,4 @@ echo "Content of [/boot/efi/EFI/boot] is:"
 ls /boot/efi/EFI/BOOT
 echo "Content of [/boot/efi/EFI/ubuntu] is:"
 ls /boot/efi/EFI/ubuntu
-# mv /boot/efi/EFI/BOOT/shimx64.efi /boot/efi/EFI/BOOT/bootx64.efi
-
-reboot
+# mv /boot/efi/EFI/BOOT/shimx64.efi /boot/efi/EFI/BOOT/bootx64.
