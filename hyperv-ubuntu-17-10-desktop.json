@@ -31,7 +31,7 @@
       "boot_wait": "5s",
       "boot_command": [
         "<esc><wait10><esc><esc><enter><wait>",
-        "set gfxpayload=1024x768<enter>",
+     0   "set gfxpayload=1024x768<enter>",
         "linux /casper/vmlinuz.efi ",
         "quiet ",
         "preseed/url=http://{{.HTTPIP}}:{{.HTTPPort}}/preseed-desktop.cfg ",

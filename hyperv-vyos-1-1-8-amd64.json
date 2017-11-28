@@ -1,0 +1,107 @@
+{
+    "variables": {
+        "name": "vyos-1-1-8",
+        "vagrant_cloud_token":"{{ env `vagrant_cloud_token`}}",
+        "version":"1.0.{{timestamp}}",
+        "cpu": "2",
+        "ram_size": "512",
+        "disk_size": "4000",
+        "iso_url": "http://mirror.vyos.net/iso/release/1.1.8/vyos-1.1.8-amd64.iso",
+        "iso_checksum": "ff4c8e1822e653d8d85f4a90f30c6d2ac047514c",
+        "iso_checksum_type": "sha1",
+        "hyperv_switchname": "internet",
+        "username": "vagrant",
+        "password": "vagrant"
+    },
+    "builders": [
+        {
+            "vm_name": "{{user `name`}}",
+            "type": "hyperv-iso",
+            "disk_size": "{{user `disk_size`}}",
+            "guest_additions_mode": "disable",
+            "iso_url": "{{user `iso_url`}}",
+            "iso_checksum_type": "{{user `iso_checksum_type`}}",
+            "iso_checksum": "{{user `iso_checksum`}}",
+            "communicator": "ssh",
+            "ssh_username": "{{user `username`}}",
+            "ssh_password": "{{user `password`}}",
+            "ssh_timeout": "4h",
+            "boot_wait": "5s",
+            "boot_command": [
+                "<enter><wait10><wait10>",
+                "vyos<enter><wait>",
+                "vyos<enter><wait>",
+                "install system<enter><wait>",
+                "<enter><wait>",
+                "<enter><wait>",
+                "<enter><wait>",
+                "Yes<enter><wait>",
+                "<enter><wait10><wait10><wait10><wait10><wait10>",
+                "<enter><wait>",
+                "vyos<enter><wait>",
+                "vyos<enter><wait>",
+                "<enter><wait5>",
+                "reboot<enter><wait>",
+                "Yes<enter><wait10><wait10><wait10><wait10>",
+                "vyos<enter><wait>",
+                "vyos<enter><wait>",
+                "sudo useradd -m -U vagrant<enter><wait>",
+                "configure<enter><wait>",
+                "set interfaces ethernet eth0 address dhcp<enter><wait>",
+                "set system login user vagrant authentication plaintext-password vagrant<enter><wait>",
+                "set system login user vagrant level admin<enter><wait>",
+                "set service ssh port 22<enter><wait>",
+                "commit<enter><wait>",
+                "save<enter><wait>",
+                "exit<enter><wait>",
+                "exit<enter><wait5>",
+                "vagrant<enter><wait>",
+                "vagrant<enter><wait>",
+                "configure<enter><wait>",
+                "delete system login user vyos<enter><wait>",
+                "commit<enter><wait>",
+                "save<enter><wait>",
+                "exit<enter><wait>"
+            ],
+            "shutdown_command": "sudo poweroff",
+            "ram_size": "{{user `ram_size`}}",
+            "cpu": "{{user `cpu`}}",
+            "generation": 1,
+            "switch_name": "{{user `hyperv_switchname`}}",
+            "enable_virtualization_extensions": false,
+            "enable_secure_boot":false,
+            "enable_dynamic_memory":false,
+            "enable_mac_spoofing":false
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "scripts": [
+                    "linux/vyos/repo.sh",
+                    "linux/vyos/virtualbox.sh",
+                    "linux/vyos/vmware.sh",
+                    "linux/vyos/init.sh",
+                    "linux/vyos/vagrant.sh",
+                    "linux/common/sshd.sh",
+                    "linux/vyos/cleanup.sh",
+                    "linux/vyos/minimize.sh"
+            ]
+        }
+    ],
+    "post-processors": [
+      [
+        {
+          "type": "vagrant",
+          "keep_input_artifact": false,
+          "output": "{{.Provider}}_{{user `name`}}.box"
+        },        
+        {
+          "type": "vagrant-cloud",
+          "box_tag": "synax/{{user `name`}}",
+          "access_token": "{{user `vagrant_cloud_token`}}",
+          "version": "{{user `version`}}"      
+        }
+      ]
+    ]
+}
